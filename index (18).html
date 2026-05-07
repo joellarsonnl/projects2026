@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<!-- saved from url=(0047)file:///H:/Downloads/projectendashboard_v4.html -->
+<html lang="nl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projectendashboard</title>
+<link href="./index2_files/css2" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#f5f4f0;
+    --surface:#ffffff;
+    --surface2:#f0efe9;
+    --border:#e2e0d8;
+    --border2:#ccc9be;
+    --text:#1a1916;
+    --text2:#6b6860;
+    --text3:#a09d96;
+    --accent:#2d6a4f;
+    --accent-bg:#eaf4ee;
+    --accent-text:#1b4332;
+    --warn:#b45309;
+    --warn-bg:#fef3c7;
+    --warn-text:#92400e;
+    --danger:#b91c1c;
+    --danger-bg:#fee2e2;
+    --danger-text:#7f1d1d;
+    --info:#1d4ed8;
+    --info-bg:#eff6ff;
+    --info-text:#1e3a8a;
+    --radius:8px;
+    --radius-lg:12px;
+    --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+    --shadow-lg:0 4px 16px rgba(0,0,0,0.10);
+  }
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+  
+  /* Layout */
+  .app{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+  .logo{font-size:20px;font-weight:600;letter-spacing:-0.02em;color:var(--text)}
+  .logo span{color:var(--accent)}
+  .header-date{font-size:13px;color:var(--text3);font-family:'DM Mono',monospace}
+
+  /* Summary cards */
+  .summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:2rem}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;box-shadow:var(--shadow)}
+  .stat-label{font-size:12px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px}
+  .stat-value{font-size:26px;font-weight:600;letter-spacing:-0.02em;color:var(--text)}
+  .stat-value.info{color:var(--info)}
+  .stat-value.accent{color:var(--accent)}
+  .stat-value.danger{color:var(--danger)}
+
+  /* Toolbar */
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;flex-wrap:wrap}
+  select,input[type=text],input[type=number],input[type=date]{font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 12px;outline:none;transition:border-color .15s}
+  select:focus,input:focus{border-color:var(--accent)}
+  .btn{font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:7px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s;box-shadow:var(--shadow)}
+  .btn:hover{background:var(--surface2);border-color:var(--border2)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .btn.primary:hover{background:#235c42}
+  .btn.danger-btn{color:var(--danger)}
+  .btn.danger-btn:hover{background:var(--danger-bg);border-color:var(--danger)}
+  .btn.icon{padding:6px 8px}
+  .ml-auto{margin-left:auto}
+
+  /* Project rows */
+  .project-list{display:flex;flex-direction:column;gap:8px}
+  .project-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .15s}
+  .project-row:hover{box-shadow:var(--shadow-lg)}
+  .project-row.drag-over-top{border-top:3px solid #0f2044}
+  .project-row.drag-over-bottom{border-bottom:3px solid #0f2044}
+  .proj-drag-handle{cursor:grab;color:rgba(255,255,255,0.4);font-size:16px;flex-shrink:0;padding:0 2px;user-select:none}
+  .proj-drag-handle:hover{color:rgba(255,255,255,0.9)}
+  .proj-drag-handle:active{cursor:grabbing}
+  .project-header{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;user-select:none;background:#0f2044;border-radius:var(--radius-lg) var(--radius-lg) 0 0;}
+  .project-header .project-name{color:#ffffff;}
+  .project-header .project-chevron{color:rgba(255,255,255,0.6);}
+  .project-header .project-deadline{color:rgba(255,255,255,0.55);}
+  .project-header .prog-pct{color:rgba(255,255,255,0.55);}
+  .project-header .prog-track{background:rgba(255,255,255,0.15);}
+  .project-header .btn{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);color:#fff;}
+  .project-header .btn:hover{background:rgba(255,255,255,0.2);}
+  .project-header .btn.danger-btn{color:#fca5a5;}
+  .project-header .badge.actief{background:rgba(219,234,254,0.2);color:#bfdbfe;}
+  .project-header .badge.afgerond{background:rgba(187,247,208,0.2);color:#86efac;}
+  .project-header .badge.wacht{background:rgba(254,243,199,0.2);color:#fde68a;}
+  .project-header .badge.vertraagd{background:rgba(254,202,202,0.2);color:#fca5a5;}
+  .project-chevron{font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+  .project-chevron.open{transform:rotate(90deg)}
+  .project-name{font-weight:500;flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+  .badge.actief{background:var(--info-bg);color:var(--info-text)}
+  .badge.afgerond{background:var(--accent-bg);color:var(--accent-text)}
+  .badge.wacht{background:var(--warn-bg);color:var(--warn-text)}
+  .badge.vertraagd{background:var(--danger-bg);color:var(--danger-text)}
+  .project-deadline{font-size:12px;color:var(--text3);white-space:nowrap;font-family:'DM Mono',monospace}
+  .progress-wrap{display:flex;align-items:center;gap:8px;min-width:80px}
+  .prog-track{height:5px;background:var(--surface2);border-radius:3px;flex:1;overflow:hidden}
+  .prog-fill{height:100%;border-radius:3px;transition:width .3s}
+  .prog-pct{font-size:12px;color:var(--text3);white-space:nowrap;font-family:'DM Mono',monospace}
+  .project-actions{display:flex;gap:4px;flex-shrink:0}
+
+  /* Scrum board */
+  .scrum-panel{border-top:1px solid var(--border);background:var(--surface2);padding:16px}
+  .scrum-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+  .scrum-info{font-size:12px;color:var(--text3)}
+  .uren-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+  .uren-track{height:4px;background:var(--border);border-radius:2px;flex:1;max-width:120px;overflow:hidden}
+  .uren-fill{height:100%;border-radius:2px}
+  .uren-label{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace}
+  .board{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;overflow-x:auto}
+  @media(max-width:680px){.board{grid-template-columns:repeat(2,1fr)}}
+  .col-wrap{background:var(--bg);border-radius:var(--radius);padding:10px;min-height:80px}
+  .col-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:8px}
+  .drop-zone{min-height:40px}
+  .drop-zone.drag-over{outline:2px dashed var(--accent);border-radius:var(--radius);background:var(--accent-bg)}
+  .task-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:9px 10px;margin-bottom:6px;font-size:13px;cursor:grab;display:flex;flex-direction:column;gap:4px;transition:box-shadow .15s}
+  .task-card:hover{box-shadow:var(--shadow-lg);border-color:var(--border2)}
+  .task-card:active{opacity:.7;cursor:grabbing}
+  .task-top{display:flex;align-items:flex-start;gap:6px}
+  .task-text{flex:1;line-height:1.4;cursor:pointer;color:var(--text)}
+  .task-text:hover{color:var(--accent)}
+  .task-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:15px;padding:0;line-height:1;flex-shrink:0;margin-top:1px}
+  .task-del:hover{color:var(--danger)}
+  .task-hours{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3)}
+  .task-hours.over{color:var(--danger)}
+  .task-hours.set{color:var(--accent)}
+
+  /* Modals */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:500;align-items:flex-start;justify-content:center;padding-top:80px;backdrop-filter:blur(2px)}
+  .overlay.show{display:flex}
+  .modal{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:1.5rem;width:360px;max-width:92vw;box-shadow:var(--shadow-lg)}
+  .modal h3{font-size:16px;font-weight:600;margin-bottom:1.25rem}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;text-transform:uppercase;letter-spacing:0.04em}
+  .field input,.field select{width:100%}
+  .field-row{display:flex;gap:10px}
+  .field-row .field{flex:1}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem}
+  .warn-msg{font-size:12px;color:var(--danger);margin-bottom:10px;display:none}
+  .warn-msg.show{display:block}
+
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+  /* Archief */
+  .archive-toggle{font-size:12px;font-weight:500;color:var(--accent);cursor:pointer;display:inline-flex;align-items:center;gap:5px;padding:8px 0 2px;border:none;background:none;font-family:'DM Sans',sans-serif}
+  .archive-toggle:hover{color:#1b4332}
+  .archive-panel{display:none;margin-top:10px;border-top:1px dashed var(--border2);padding-top:12px}
+  .archive-panel.open{display:block}
+  .archive-week-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin:10px 0 6px}
+  .archive-week-title:first-child{margin-top:0}
+  .archive-task{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 8px;background:var(--bg);border-radius:var(--radius);margin-bottom:4px}
+  .archive-task-name{color:var(--text2)}
+  .archive-task-hours{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);white-space:nowrap;margin-left:8px}
+  .archive-empty{font-size:12px;color:var(--text3);font-style:italic}
+
+  /* Per-project uren badge in header */
+  .proj-uren-badge{display:flex;align-items:center;gap:6px;font-size:12px;color:rgba(255,255,255,0.75);white-space:nowrap;font-family:'DM Mono',monospace;background:rgba(255,255,255,0.08);padding:4px 9px;border-radius:20px;flex-shrink:0}
+  .proj-uren-badge.over{color:#fca5a5}
+  .proj-uren-badge.empty{color:rgba(255,255,255,0.35)}
+  .proj-uren-bar{display:inline-block;width:48px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;vertical-align:middle}
+  .proj-uren-fill{display:block;height:100%;border-radius:2px}
+
+  /* Tabs */
+  .tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)}
+  .tab-btn{font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;padding:9px 20px;cursor:pointer;border:none;background:none;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+  .tab-btn:hover{color:var(--text)}
+  .tab-btn.active{color:#0f2044;border-bottom-color:#0f2044;font-weight:600}
+  .tab-page{display:none}.tab-page.active{display:block}
+
+  /* Charts */
+  .charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+  @media(max-width:640px){.charts-grid{grid-template-columns:1fr}}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;box-shadow:var(--shadow)}
+  .chart-card.full{grid-column:1/-1}
+  .chart-title{font-size:14px;font-weight:600;color:#0f2044;margin-bottom:4px}
+  .chart-sub{font-size:12px;color:var(--text3);margin-bottom:1rem}
+  .chart-wrap{position:relative;display:flex;justify-content:center;align-items:center}
+  canvas{max-width:100%}
+
+  /* Project pie selector */
+  .proj-selector{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+  .proj-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;color:var(--text2);transition:all .15s}
+  .proj-pill.active{border-color:#0f2044;background:#0f2044;color:#fff}
+
+  /* Bar chart custom */
+  .bar-chart{display:flex;flex-direction:column;gap:10px;width:100%}
+  .bar-row{display:flex;align-items:center;gap:10px}
+  .bar-label{font-size:12px;color:var(--text2);width:160px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar-tracks{flex:1;display:flex;flex-direction:column;gap:3px}
+  .bar-track{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:5px;transition:width .4s}
+  .bar-nums{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;width:70px;text-align:right;flex-shrink:0}
+
+  /* Donut center text */
+  .donut-wrap{position:relative;width:200px;height:200px;margin:0 auto}
+  .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+  .donut-center-val{font-size:22px;font-weight:600;color:#0f2044}
+  .donut-center-lbl{font-size:11px;color:var(--text3)}
+
+  /* Legend */
+  .chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+  .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+
+<!-- Inlogscherm -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:#f5f4f0;align-items:center;justify-content:center;z-index:9999">
+  <div style="background:#ffffff;border:1px solid #e2e0d8;border-radius:12px;padding:2rem;width:320px;max-width:90vw;box-shadow:0 4px 16px rgba(0,0,0,0.10)">
+    <div style="text-align:center;margin-bottom:1.5rem">
+      <div style="font-size:20px;font-weight:600;letter-spacing:-0.02em">Mijn <span style="color:#2d6a4f">Projecten</span></div>
+      <div style="font-size:13px;color:#6b6860;margin-top:4px">Voer je wachtwoord in om verder te gaan</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <input type="password" id="pwd-input" placeholder="Wachtwoord" style="width:100%;box-sizing:border-box;font-size:14px;padding:9px 12px;border:1px solid #e2e0d8;border-radius:8px;outline:none;font-family:inherit" onkeydown="if(event.key==='Enter')checkPwd()"/>
+    </div>
+    <div id="pwd-error" style="display:none;font-size:12px;color:#b91c1c;margin-bottom:10px;text-align:center">Onjuist wachtwoord. Probeer opnieuw.</div>
+    <button onclick="checkPwd()" style="width:100%;padding:9px;background:#0f2044;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit">Inloggen</button>
+  </div>
+</div>
+
+<div class="app" id="main-app">
+  <header>
+    <div>
+      <div class="logo">Mijn <span>Projecten</span></div>
+      <div id="week-subtitle" style="font-size:13px;font-weight:500;color:var(--text2);margin-top:2px"></div>
+    </div>
+    <div class="header-date" id="header-date"></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab(&#39;projecten&#39;)">📋 Projecten</button>
+    <button class="tab-btn" onclick="switchTab(&#39;grafieken&#39;)">📊 Grafieken</button>
+  </div>
+
+  <div class="tab-page active" id="tab-projecten">
+  <div class="summary">
+    <div class="stat-card"><div class="stat-label">Projecten</div><div class="stat-value" id="s-total">6</div></div>
+    <div class="stat-card"><div class="stat-label">Actief</div><div class="stat-value info" id="s-actief">6</div></div>
+    <div class="stat-card"><div class="stat-label">Verwacht</div><div class="stat-value accent" id="s-exp">39.5u</div></div>
+    <div class="stat-card"><div class="stat-label">Besteed</div><div class="stat-value" id="s-spent">13u</div></div>
+  </div>
+
+  <div class="toolbar">
+    <select id="filter-status">
+      <option value="all">Alle statussen</option>
+      <option value="Actief">Actief</option>
+      <option value="Afgerond">Afgerond</option>
+      <option value="In de wacht">In de wacht</option>
+      <option value="Vertraagd">Vertraagd</option>
+    </select>
+    <button class="btn primary ml-auto" onclick="openProjectModal()">+ Project toevoegen</button>
+    <button class="btn" onclick="exportData()" title="Download je data als back-up">💾 Exporteer data</button>
+    <label class="btn" title="Laad een eerder geëxporteerd bestand" style="cursor:pointer">📂 Importeer data<input type="file" accept=".json" onchange="importData(event)" style="display:none"/></label>
+    <button class="btn" onclick="resetData()" title="Wis lokale opslag en laad standaarddata" style="color:var(--danger)">🔄 Reset data</button>
+  </div>
+
+  <div class="project-list" id="project-list"></div>
+  </div><!-- /tab-projecten -->
+
+  <!-- GRAFIEKEN TAB -->
+  <div class="tab-page" id="tab-grafieken">
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">🥧 Verwachte uren per project</div>
+        <div class="chart-sub">Verdeling van alle verwachte uren (excl. backlog)</div>
+        <div class="donut-wrap">
+          <canvas id="chart-proj-pie" width="200" height="200"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-val" id="donut-total">0u</div>
+            <div class="donut-center-lbl">totaal verwacht</div>
+          </div>
+        </div>
+        <div class="chart-legend" id="legend-proj-pie"></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">🎯 Totale voortgang taken</div>
+        <div class="chart-sub">Hoeveel taken zijn al afgerond?</div>
+        <div class="donut-wrap">
+          <canvas id="chart-progress-ring" width="200" height="200"></canvas>
+          <div class="donut-center">
+            <div class="donut-center-val" id="ring-pct">0%</div>
+            <div class="donut-center-lbl" id="ring-lbl">klaar</div>
+          </div>
+        </div>
+        <div class="chart-legend" id="legend-progress"></div>
+      </div>
+      <div class="chart-card full">
+        <div class="chart-title">📊 Besteed vs Verwacht per project</div>
+        <div class="chart-sub">Groen = verwacht · Donkerblauw = besteed (excl. backlog)</div>
+        <div class="bar-chart" id="bar-chart-proj"></div>
+      </div>
+      <div class="chart-card full">
+        <div class="chart-title">🥧 Verwachte uren per taak</div>
+        <div class="chart-sub">Selecteer een project om de taakverdeling te zien (excl. backlog)</div>
+        <div class="proj-selector" id="proj-selector"></div>
+        <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+          <div class="donut-wrap" style="flex-shrink:0">
+            <canvas id="chart-task-pie" width="200" height="200"></canvas>
+            <div class="donut-center">
+              <div class="donut-center-val" id="task-donut-total">0u</div>
+              <div class="donut-center-lbl">verwacht</div>
+            </div>
+          </div>
+          <div class="chart-legend" id="legend-task-pie" style="flex:1;margin-top:0;align-content:flex-start;max-height:200px;overflow-y:auto"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /tab-grafieken -->
+
+<!-- Project modal -->
+<div class="overlay" id="proj-overlay">
+  <div class="modal">
+    <h3 id="proj-modal-title">Project bewerken</h3>
+    <div class="field"><label>Projectnaam</label><input type="text" id="p-name" placeholder="Naam van het project"></div>
+    <div class="field"><label>Status</label>
+      <select id="p-status"><option>Actief</option><option>In de wacht</option><option>Afgerond</option><option>Vertraagd</option></select></div>
+    <div class="field-row">
+      <div class="field"><label>Deadline</label><input type="date" id="p-deadline"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeProjModal()">Annuleren</button>
+      <button class="btn primary" onclick="saveProject()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Taak toevoegen modal -->
+<div class="overlay" id="task-overlay">
+  <div class="modal">
+    <h3>Taak toevoegen</h3>
+    <div class="field"><label>Taaknaam</label><input type="text" id="t-name" placeholder="Omschrijving van de taak"></div>
+    <div class="field"><label>Kolom</label>
+      <select id="t-col"><option value="backlog">Backlog</option><option value="todo">Te doen</option><option value="doing">In uitvoering</option><option value="done">Klaar</option></select></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeTaskModal()">Annuleren</button>
+      <button class="btn primary" onclick="saveTask()">Toevoegen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Uren modal -->
+<div class="overlay" id="uren-overlay">
+  <div class="modal">
+    <h3 id="uren-title" style="word-break:break-word"></h3>
+    <p id="uren-col" style="font-size:12px;color:var(--text3);margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em;font-weight:500"></p>
+    <div class="field-row">
+      <div class="field"><label>Verwacht (uren)</label><input type="number" id="u-expected" min="0" value="0" oninput="checkUrenWarn()"></div>
+      <div class="field"><label>Besteed (uren)</label><input type="number" id="u-spent" min="0" value="0" oninput="checkUrenWarn()"></div>
+    </div>
+    <div class="warn-msg" id="uren-warn">⚠ Besteed overschrijdt verwacht!</div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeUrenModal()">Annuleren</button>
+      <button class="btn primary" onclick="saveUren()">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY='mijn_projectendashboard'; // vaste sleutel — nooit meer wijzigen!
+const ARCHIVE_KEY='mijn_projectendashboard_archief';
+const WEEK_KEY='mijn_dashboard_lastweek';
+const colOrder=['backlog','todo','doing','done'];
+const colLabels={backlog:'Backlog',todo:'Te doen',doing:'In uitvoering',done:'Klaar'};
+const defaultProjects=[
+  {id:1,name:'ICTU: Rijksdashboard Woo-verzoeken',status:'Actief',deadline:'2026-08-28',progress:0,tasks:{
+    backlog:[
+      {t:'Op zoeken hoeveel dwangsommen RVO',e:0,s:0},
+      {t:'Dubbeling RVO bespreken met Tom',e:0,s:0},
+      {t:'Controle aanlevering bouwen met claude',e:0,s:0},
+      {t:'Handleiding updaten',e:0,s:0},
+      {t:'Actiepuntenlijst afronden en rondsturen',e:0,s:0},
+      {t:'Jaarverslag schrijven',e:0,s:0},
+      {t:'Extra vergadering plannen? Kwam uit vergadering denk ik',e:0,s:0},
+    ],
+    todo:[
+      {t:'Controleren aanlevering gegevens ministeries + herinnering sturen',e:4,s:0},
+      {t:'Versturen Toolkit naar ministeries',e:1,s:0},
+      {t:'Herinnering sturen ministeries',e:4,s:0},
+    ],
+    doing:[],
+    done:[
+      {t:'Controleren Woo-gegevens',e:3,s:3},
+      {t:'E-mails Woo',e:2,s:2},
+    ]
+  }},
+  {id:2,name:'ICTU: Gem',status:'Actief',deadline:'',progress:0,tasks:{
+    backlog:[
+      {t:'Afspreken met Tom/Lisette wat we volgende keer doen',e:0,s:0},
+      {t:'Save the date concept opstellen',e:1,s:0},
+    ],
+    todo:[
+      {t:'Save the date/uitnodiging versturen',e:1,s:0},
+    ],
+    doing:[
+      {t:'Nieuwsbrief huidige week afronden',e:5,s:0.75},
+    ],
+    done:[]
+  }},
+  {id:3,name:'Communicatieadviseur CidZ',status:'Actief',deadline:'',progress:0,tasks:{
+    backlog:[
+      {t:'Mayflower benaderen',e:0,s:0},
+      {t:'Reviews CidZ',e:0,s:0},
+      {t:'Lead delta directeuren berichten sturen',e:0,s:0},
+      {t:'Contact Erik benaderen (Jan?) tegenstander Cor',e:0,s:0},
+      {t:'Teksten reviewen website CidZ',e:5,s:0},
+      {t:'Lead delta overleg Jasper en Erik',e:1,s:0},
+    ],
+    todo:[
+      {t:'Contact Cor Lievaart benaderen',e:0.5,s:0},
+    ],
+    doing:[
+      {t:'Notulen wekelijkse meeting afronden',e:0.5,s:0},
+      {t:'Mayflower uitwerken gesprek',e:1,s:0.5},
+    ],
+    done:[
+      {t:'Lead delta met Dave oppakken',e:2,s:2},
+      {t:'Bezig met Tolkie, incl. overleggen',e:2,s:2},
+      {t:'Wekelijks meeting CidZ',e:1,s:1},
+    ]
+  }},
+  {id:4,name:'Raad van Toezicht AVG-Polikliniek',status:'Actief',deadline:'',progress:0,tasks:{
+    backlog:[
+      {t:'Jaarverslag concept',e:2.5,s:0},
+      {t:'Voorbereiding extra vergaderingen + meelopen met mensen',e:1,s:0},
+    ],
+    todo:[
+      {t:'notulen afronden',e:1.5,s:0},
+      {t:'Actiepunten en besluiten- bijwerken en meenemen in verslag',e:1,s:0},
+    ],
+    doing:[
+      {t:'Factuur maken en doorsturen naar Erik',e:0.5,s:0},
+    ],
+    done:[]
+  }},
+  {id:5,name:'Veiling Haagse Hoed Challenge',status:'Actief',deadline:'',progress:0,tasks:{
+    backlog:[
+      {t:'Voorbereiding veiling',e:1,s:0},
+    ],
+    todo:[
+      {t:'Nadenken veiling idee',e:1.5,s:0},
+    ],
+    doing:[],done:[]
+  }},
+  {id:1778079282248,name:'ICTU overig',status:'Actief',deadline:'',progress:0,tasks:{
+    backlog:[],
+    todo:[],
+    doing:[
+      {t:'Kennisfestival deelnemen',e:5,s:0},
+    ],
+    done:[
+      {t:'kennismaking ICTU managers',e:1,s:1},
+      {t:'Communicatiebericht externe nieuwsbrief',e:1.5,s:1.5},
+    ]
+  }},
+];
+
+let projects=[];
+let expanded={};
+let editingProjId=null;
+let taskProjId=null;
+let urenRef=null;
+let dragged=null;
+
+let archive={};
+
+function getISOWeek(date){
+  const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()));
+  const day=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()+4-day);
+  const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d-yearStart)/86400000)+1)/7);
+}
+
+function getWeekKey(date){
+  const w=getISOWeek(date);
+  return `${date.getFullYear()}-W${String(w).padStart(2,'0')}`;
+}
+function loadArchive(){
+  try{const r=localStorage.getItem(ARCHIVE_KEY);if(r)archive=JSON.parse(r);}catch(e){archive={};}
+}
+function saveArchive(){
+  try{localStorage.setItem(ARCHIVE_KEY,JSON.stringify(archive));}catch(e){}
+}
+function checkWeekRollover(){
+  const currentKey=getWeekKey(new Date());
+  const lastKey=localStorage.getItem(WEEK_KEY)||'';
+  if(lastKey && lastKey!==currentKey){
+    // Nieuwe week — verplaats alle 'klaar' taken naar archief
+    projects.forEach(p=>{
+      if(p.tasks.done&&p.tasks.done.length>0){
+        const pid=String(p.id);
+        if(!archive[pid])archive[pid]={};
+        if(!archive[pid][lastKey])archive[pid][lastKey]=[];
+        archive[pid][lastKey].push(...p.tasks.done);
+        p.tasks.done=[];
+      }
+    });
+    saveArchive();
+    save();
+  }
+  localStorage.setItem(WEEK_KEY,currentKey);
+}
+
+function load(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const d=JSON.parse(raw);
+      const saved=d.projects||[];
+      // Bereken totale verwachte uren in opgeslagen data
+      const savedExp=saved.reduce((a,p)=>{
+        if(!p.tasks)return a;
+        return a+['todo','doing','done'].flatMap(c=>p.tasks[c]||[]).reduce((b,t)=>b+(+t.e||0),0);
+      },0);
+      if(savedExp>0){
+        // Opgeslagen data heeft uren — gebruik die
+        projects=saved;
+        expanded=d.expanded||{};
+      } else {
+        // Geen uren opgeslagen — laad standaarddata
+        projects=JSON.parse(JSON.stringify(defaultProjects));
+        expanded={};
+        save();
+      }
+    } else {
+      projects=JSON.parse(JSON.stringify(defaultProjects));
+      expanded={};
+      save();
+    }
+  }catch(e){
+    projects=JSON.parse(JSON.stringify(defaultProjects));
+    expanded={};
+  }
+  loadArchive();
+  checkWeekRollover();
+}
+
+function save(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({projects,expanded}));}catch(e){}
+}
+
+function allTasks(p){return colOrder.flatMap(c=>p.tasks[c]);}
+// Backlog telt NIET mee in uren — alleen todo, doing, done
+const activeColOrder=['todo','doing','done'];
+function activeTasks(p){return activeColOrder.flatMap(c=>p.tasks[c]);}
+function totalExp(p){return activeTasks(p).reduce((a,t)=>a+(+t.e||0),0);}
+function totalSpt(p){return activeTasks(p).reduce((a,t)=>a+(+t.s||0),0);}
+
+function fmtDate(d){
+  if(!d)return '—';
+  const[y,m,day]=d.split('-');
+  return `${day}-${m}-${y}`;
+}
+
+function badgeClass(s){
+  if(s==='Actief')return 'actief';
+  if(s==='Afgerond')return 'afgerond';
+  if(s==='In de wacht')return 'wacht';
+  if(s==='Vertraagd')return 'vertraagd';
+  return 'actief';
+}
+
+function progColor(s){
+  if(s==='Afgerond')return '#2d6a4f';
+  if(s==='Vertraagd')return '#b91c1c';
+  if(s==='In de wacht')return '#b45309';
+  return '#1d4ed8';
+}
+
+function updateSummary(){
+  document.getElementById('s-total').textContent=projects.length;
+  document.getElementById('s-actief').textContent=projects.filter(p=>p.status==='Actief').length;
+  document.getElementById('s-exp').textContent=projects.reduce((a,p)=>a+totalExp(p),0)+'u';
+  const spt=projects.reduce((a,p)=>a+totalSpt(p),0);
+  const el=document.getElementById('s-spent');
+  el.textContent=spt+'u';
+  el.className='stat-value'+(spt>projects.reduce((a,p)=>a+totalExp(p),0)&&projects.reduce((a,p)=>a+totalExp(p),0)>0?' danger':'');
+}
+
+function render(){
+  updateSummary();
+  const filter=document.getElementById('filter-status').value;
+  const list=filter==='all'?projects:projects.filter(p=>p.status===filter);
+  const container=document.getElementById('project-list');
+  container.innerHTML='';
+
+  list.forEach(p=>{
+    const isOpen=!!expanded[p.id];
+    const exp=totalExp(p),spt=totalSpt(p);
+    const urenPct=exp>0?Math.min(100,Math.round(spt/exp*100)):0;
+    const urenColor=spt>exp&&exp>0?'#b91c1c':'#2d6a4f';
+    const doneT=p.tasks.done.length;
+    const totalT=allTasks(p).length;
+    // Voortgang = bestede uren / verwachte uren (te doen + in uitvoering + klaar)
+    const autoProg=exp>0?Math.min(100,Math.round(spt/exp*100)):0;
+
+    const row=document.createElement('div');
+    row.className='project-row';
+
+    // Uren per project (excl. backlog)
+    const urenBadge=exp>0||spt>0?`<div class="proj-uren-badge ${spt>exp&&exp>0?'over':''}" title="Besteed vs verwacht (excl. backlog)">
+      <span>⏱</span> ${spt}u / ${exp}u
+      ${exp>0?`<span class="proj-uren-bar"><span class="proj-uren-fill" style="width:${Math.min(100,urenPct)}%;background:${urenColor}"></span></span>`:''}
+    </div>`:'<div class="proj-uren-badge empty">⏱ Geen uren</div>';
+
+    let boardHTML='';
+    if(isOpen){
+      const cols=colOrder.map(col=>{
+        const cards=p.tasks[col].map((task,ti)=>{
+          const hasH=task.e>0||task.s>0;
+          const isOver=task.s>task.e&&task.e>0;
+          const hourClass=isOver?'over':hasH?'set':'';
+          const hourText=hasH?`${task.s}u besteed / ${task.e}u verwacht ${isOver?'⚠':''}`:'Klik voor uren';
+          return `<div class="task-card" draggable="true" data-pid="${p.id}" data-col="${col}" data-idx="${ti}">
+            <div class="task-top">
+              <span class="task-text" onclick="openUrenModal(${p.id},'${col}',${ti})" title="Klik voor uren">${task.t}</span>
+              <button class="task-del" onclick="deleteTask(${p.id},'${col}',${ti})" title="Verwijderen">×</button>
+            </div>
+            <div class="task-hours ${hourClass}">${hourText}</div>
+          </div>`;
+        }).join('');
+        return `<div class="col-wrap">
+          <div class="col-title">${colLabels[col]} (${p.tasks[col].length})</div>
+          <div class="drop-zone" data-pid="${p.id}" data-col="${col}">${cards}</div>
+        </div>`;
+      }).join('');
+
+      // Archief voor dit project
+      const pid=String(p.id);
+      const projArchive=archive[pid]||{};
+      const archiveWeeks=Object.keys(projArchive).sort().reverse();
+      const archiveContent=archiveWeeks.length===0
+        ?'<div class="archive-empty">Nog geen afgeronde werkzaamheden uit eerdere weken.</div>'
+        :archiveWeeks.map(wk=>{
+            const[yr,wnum]=wk.split('-W');
+            const tasks=projArchive[wk];
+            return`<div class="archive-week-title">📅 Week ${parseInt(wnum)} — ${yr}</div>`+
+              tasks.map(t=>`<div class="archive-task">
+                <span class="archive-task-name">✓ ${t.t}</span>
+                <span class="archive-task-hours">${t.s}u besteed / ${t.e}u verwacht</span>
+              </div>`).join('');
+          }).join('');
+
+      boardHTML=`<div class="scrum-panel">
+        <div class="scrum-meta">
+          <div>
+            <div class="scrum-info">${doneT} van ${allTasks(p).length} taken klaar · <span style="color:var(--accent)">Klik op taak voor uren</span></div>
+            ${exp>0?`<div class="uren-row">
+              <div class="uren-track"><div class="uren-fill" style="width:${urenPct}%;background:${urenColor}"></div></div>
+              <span class="uren-label">${spt}u besteed / ${exp}u verwacht <span style="opacity:.6;font-size:10px">(excl. backlog)</span></span>
+            </div>`:'<div style="font-size:11px;color:var(--text3);margin-top:2px">Backlog telt niet mee in uren</div>'}
+          </div>
+          <button class="btn" onclick="openTaskModal(${p.id})">+ Taak toevoegen</button>
+        </div>
+        <div class="board">${cols}</div>
+        <button class="archive-toggle" onclick="toggleArchive('${pid}')">
+          <span id="arc-arrow-${pid}">▶</span> Afgeronde werkzaamheden (eerdere weken)
+        </button>
+        <div class="archive-panel" id="arc-panel-${pid}">
+          ${archiveContent}
+        </div>
+      </div>`;
+    }
+
+    row.innerHTML=`
+      <div class="project-header" onclick="toggleExpand(${p.id})">
+        <span class="proj-drag-handle" draggable="true" data-projid="${p.id}" onclick="event.stopPropagation()" title="Slepen om volgorde te wijzigen">⠿</span>
+        <span class="project-chevron ${isOpen?'open':''}">▶</span>
+        <span class="project-name">${p.name}</span>
+        <span class="badge ${badgeClass(p.status)}">${p.status}</span>
+        <span class="project-deadline">${fmtDate(p.deadline)}</span>
+        ${urenBadge}
+        <div class="progress-wrap">
+          <div class="prog-track"><div class="prog-fill" style="width:${autoProg}%;background:${progColor(p.status)}"></div></div>
+          <span class="prog-pct">${autoProg}%</span>
+        </div>
+        <div class="project-actions" onclick="event.stopPropagation()">
+          <button class="btn icon" onclick="openProjectModal(${p.id})" title="Bewerken">✎</button>
+          <button class="btn icon danger-btn" onclick="deleteProject(${p.id})" title="Verwijderen">🗑</button>
+        </div>
+      </div>
+      ${boardHTML}`;
+    container.appendChild(row);
+  });
+
+  setupDragDrop();
+}
+
+function setupDragDrop(){
+  // --- Project reordering ---
+  let draggedProjId=null;
+  document.querySelectorAll('.proj-drag-handle').forEach(handle=>{
+    handle.addEventListener('dragstart',e=>{
+      draggedProjId=+handle.dataset.projid;
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(()=>handle.closest('.project-row').style.opacity='0.5',0);
+    });
+    handle.addEventListener('dragend',e=>{
+      handle.closest('.project-row').style.opacity='1';
+      document.querySelectorAll('.project-row').forEach(r=>{
+        r.classList.remove('drag-over-top','drag-over-bottom');
+      });
+      draggedProjId=null;
+    });
+  });
+  document.querySelectorAll('.project-row').forEach(row=>{
+    row.addEventListener('dragover',e=>{
+      if(!draggedProjId)return;
+      e.preventDefault();
+      const rect=row.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      row.classList.remove('drag-over-top','drag-over-bottom');
+      row.classList.add(e.clientY<mid?'drag-over-top':'drag-over-bottom');
+    });
+    row.addEventListener('dragleave',()=>{
+      row.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    row.addEventListener('drop',e=>{
+      if(!draggedProjId)return;
+      e.preventDefault();
+      row.classList.remove('drag-over-top','drag-over-bottom');
+      const targetId=+row.querySelector('.proj-drag-handle').dataset.projid;
+      if(draggedProjId===targetId)return;
+      const fromIdx=projects.findIndex(p=>p.id===draggedProjId);
+      const toIdx=projects.findIndex(p=>p.id===targetId);
+      if(fromIdx===-1||toIdx===-1)return;
+      const rect=row.getBoundingClientRect();
+      const mid=rect.top+rect.height/2;
+      const insertAfter=e.clientY>=mid;
+      const[moved]=projects.splice(fromIdx,1);
+      const newIdx=projects.findIndex(p=>p.id===targetId);
+      projects.splice(insertAfter?newIdx+1:newIdx,0,moved);
+      draggedProjId=null;
+      save();render();
+    });
+  });
+
+  // --- Task card drag-and-drop ---
+  document.querySelectorAll('.task-card').forEach(card=>{
+    card.addEventListener('dragstart',e=>{
+      dragged={pid:+card.dataset.pid,col:card.dataset.col,idx:+card.dataset.idx};
+      setTimeout(()=>card.style.opacity='0.4',0);
+    });
+    card.addEventListener('dragend',()=>card.style.opacity='1');
+  });
+  document.querySelectorAll('.drop-zone').forEach(zone=>{
+    zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+    zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+    zone.addEventListener('drop',e=>{
+      e.preventDefault();zone.classList.remove('drag-over');
+      if(!dragged)return;
+      const toPid=+zone.dataset.pid,toCol=zone.dataset.col;
+      if(dragged.pid!==toPid)return;
+      const proj=projects.find(p=>p.id===toPid);
+      if(!proj)return;
+      const[task]=proj.tasks[dragged.col].splice(dragged.idx,1);
+      proj.tasks[toCol].push(task);
+      dragged=null;save();render();
+    });
+  });
+}
+
+function toggleExpand(id){expanded[id]=!expanded[id];save();render();}
+
+/* Project modal */
+function openProjectModal(id){
+  editingProjId=id||null;
+  const p=id?projects.find(x=>x.id===id):null;
+  document.getElementById('proj-modal-title').textContent=p?'Project bewerken':'Project toevoegen';
+  document.getElementById('p-name').value=p?p.name:'';
+  document.getElementById('p-status').value=p?p.status:'Actief';
+  document.getElementById('p-deadline').value=p?p.deadline:'';
+  document.getElementById('proj-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('p-name').focus(),50);
+}
+function closeProjModal(){document.getElementById('proj-overlay').classList.remove('show');}
+function saveProject(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name)return;
+  const status=document.getElementById('p-status').value;
+  const deadline=document.getElementById('p-deadline').value;
+  if(editingProjId){
+    const p=projects.find(x=>x.id===editingProjId);
+    if(p){p.name=name;p.status=status;p.deadline=deadline;}
+  }else{
+    projects.push({id:Date.now(),name,status,deadline,progress:0,tasks:{backlog:[],todo:[],doing:[],done:[]}});
+  }
+  closeProjModal();save();render();
+}
+function deleteProject(id){
+  if(!confirm('Project verwijderen?'))return;
+  projects=projects.filter(p=>p.id!==id);
+  delete expanded[id];save();render();
+}
+
+/* Taak modal */
+function openTaskModal(pid){
+  taskProjId=pid;
+  document.getElementById('t-name').value='';
+  document.getElementById('t-col').value='backlog';
+  document.getElementById('task-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('t-name').focus(),50);
+}
+function closeTaskModal(){document.getElementById('task-overlay').classList.remove('show');}
+function saveTask(){
+  const name=document.getElementById('t-name').value.trim();
+  const col=document.getElementById('t-col').value;
+  if(!name||!taskProjId)return;
+  const p=projects.find(x=>x.id===taskProjId);
+  if(p)p.tasks[col].push({t:name,e:0,s:0});
+  closeTaskModal();save();render();
+}
+function deleteTask(pid,col,idx){
+  const p=projects.find(x=>x.id===pid);
+  if(p)p.tasks[col].splice(idx,1);
+  save();render();
+}
+
+/* Uren modal */
+function openUrenModal(pid,col,idx){
+  const p=projects.find(x=>x.id===pid);
+  if(!p)return;
+  urenRef={pid,col,idx};
+  const task=p.tasks[col][idx];
+  document.getElementById('uren-title').textContent=task.t;
+  document.getElementById('uren-col').textContent=colLabels[col];
+  document.getElementById('u-expected').value=task.e||0;
+  document.getElementById('u-spent').value=task.s||0;
+  checkUrenWarn();
+  document.getElementById('uren-overlay').classList.add('show');
+  setTimeout(()=>document.getElementById('u-expected').focus(),50);
+}
+function closeUrenModal(){document.getElementById('uren-overlay').classList.remove('show');urenRef=null;}
+function checkUrenWarn(){
+  const e=+document.getElementById('u-expected').value||0;
+  const s=+document.getElementById('u-spent').value||0;
+  document.getElementById('uren-warn').className='warn-msg'+(s>e&&e>0?' show':'');
+}
+function saveUren(){
+  if(!urenRef)return;
+  const{pid,col,idx}=urenRef;
+  const p=projects.find(x=>x.id===pid);
+  if(p){
+    p.tasks[col][idx].e=Math.max(0,+document.getElementById('u-expected').value||0);
+    p.tasks[col][idx].s=Math.max(0,+document.getElementById('u-spent').value||0);
+  }
+  closeUrenModal();save();render();
+}
+
+/* Close overlays on background click */
+document.querySelectorAll('.overlay').forEach(ov=>{
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.classList.remove('show');});
+});
+
+/* Enter key in modals */
+document.getElementById('p-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveProject();});
+document.getElementById('t-name').addEventListener('keydown',e=>{if(e.key==='Enter')saveTask();});
+
+/* Date */
+const _now=new Date();
+document.getElementById('header-date').textContent=_now.toLocaleDateString('nl-NL',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('week-subtitle').textContent='Projectmanagement in week '+getISOWeek(_now);
+
+/* Filter */
+document.getElementById('filter-status').addEventListener('change',render);
+
+function toggleArchive(pid){
+  const panel=document.getElementById(`arc-panel-${pid}`);
+  const arrow=document.getElementById(`arc-arrow-${pid}`);
+  if(!panel)return;
+  const isOpen=panel.classList.toggle('open');
+  arrow.textContent=isOpen?'▼':'▶';
+}
+
+function resetData(){
+  if(!confirm('Weet je zeker dat je de data wilt resetten naar de standaardwaarden? Al je huidige wijzigingen gaan verloren.'))return;
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(ARCHIVE_KEY);
+  localStorage.removeItem(WEEK_KEY);
+  projects=JSON.parse(JSON.stringify(defaultProjects));
+  expanded={};
+  archive={};
+  save();
+  render();
+  alert('✅ Data hersteld naar standaardwaarden!');
+}
+
+/* Export / Import */
+function exportData(){
+  const data=JSON.stringify({projects,expanded},null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='dashboard-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=evt=>{
+    try{
+      const d=JSON.parse(evt.target.result);
+      if(d.projects){
+        projects=d.projects;
+        expanded=d.expanded||{};
+        save();render();
+        alert('✅ Data succesvol geladen!');
+      } else {
+        alert('❌ Ongeldig bestand.');
+      }
+    }catch(err){alert('❌ Fout bij inladen: '+err.message);}
+  };
+  reader.readAsText(file);
+  e.target.value='';
+}
+
+/* Wachtwoordbeveiliging */
+const PWD='dashboard2026'; // ← verander dit naar jouw eigen wachtwoord
+
+function showLogin(){
+  document.getElementById('main-app').style.display='none';
+  const ls=document.getElementById('login-screen');
+  ls.style.display='flex';
+  setTimeout(()=>document.getElementById('pwd-input').focus(),100);
+}
+
+function checkPwd(){
+  const val=document.getElementById('pwd-input').value;
+  if(val===PWD){
+    sessionStorage.setItem('dashboard_auth','ok');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
+  } else {
+    document.getElementById('pwd-error').style.display='block';
+    document.getElementById('pwd-input').value='';
+    document.getElementById('pwd-input').focus();
+  }
+}
+
+// Direct controleren — vóór render
+if(sessionStorage.getItem('dashboard_auth')!=='ok'){
+  showLogin();
+}
+
+/* Init */
+load();render();
+
+/* ===== TABS ===== */
+function switchTab(name){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{if(b.textContent.includes(name==='projecten'?'Projecten':'Grafieken'))b.classList.add('active');});
+  if(name==='grafieken')renderCharts();
+}
+
+/* ===== CHARTS ===== */
+const PALETTE=['#0f2044','#2d6a4f','#1d4ed8','#b45309','#7c3aed','#0891b2','#be123c','#065f46','#92400e','#1e3a8a'];
+let chartProjPie=null,chartProgressRing=null,chartTaskPie=null;
+let selectedProjId=null;
+
+function drawDonut(canvasId,data,colors){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas)return null;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height,cx=W/2,cy=H/2,r=Math.min(W,H)/2-10,inner=r*0.62;
+  ctx.clearRect(0,0,W,H);
+  const total=data.reduce((a,v)=>a+v,0);
+  if(total===0){
+    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#e2e0d8';ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    return;
+  }
+  let start=-Math.PI/2;
+  data.forEach((v,i)=>{
+    const slice=v/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,start,start+slice);ctx.closePath();
+    ctx.fillStyle=colors[i%colors.length];ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,inner,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    start+=slice;
+  });
+}
+
+function renderCharts(){
+  // helpers
+  const activeC=['todo','doing','done'];
+  const tExp=p=>activeC.flatMap(c=>p.tasks[c]).reduce((a,t)=>a+(+t.e||0),0);
+  const tSpt=p=>activeC.flatMap(c=>p.tasks[c]).reduce((a,t)=>a+(+t.s||0),0);
+  const allT=p=>['backlog','todo','doing','done'].flatMap(c=>p.tasks[c]);
+
+  // 1. Project pie donut
+  const projData=projects.map(p=>tExp(p));
+  const projTotal=projData.reduce((a,v)=>a+v,0);
+  document.getElementById('donut-total').textContent=projTotal+'u';
+  drawDonut('chart-proj-pie',projData,PALETTE);
+  const leg1=document.getElementById('legend-proj-pie');
+  leg1.innerHTML=projects.map((p,i)=>`<div class="legend-item"><div class="legend-dot" style="background:${PALETTE[i%PALETTE.length]}"></div>${p.name.length>22?p.name.slice(0,22)+'…':p.name} <span style="color:var(--text3);margin-left:4px">${tExp(p)}u</span></div>`).join('');
+
+  // 2. Progress ring
+  const doneCount=projects.reduce((a,p)=>a+p.tasks.done.length,0);
+  const totalCount=projects.reduce((a,p)=>a+allT(p).length,0);
+  const donePct=totalCount>0?Math.round(doneCount/totalCount*100):0;
+  document.getElementById('ring-pct').textContent=donePct+'%';
+  document.getElementById('ring-lbl').textContent=`${doneCount}/${totalCount} klaar`;
+  drawDonut('chart-progress-ring',[doneCount,Math.max(0,totalCount-doneCount)],['#2d6a4f','#e2e0d8']);
+  document.getElementById('legend-progress').innerHTML=`
+    <div class="legend-item"><div class="legend-dot" style="background:#2d6a4f"></div>Klaar (${doneCount})</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e2e0d8"></div>Open (${totalCount-doneCount})</div>`;
+
+  // 3. Bar chart besteed vs verwacht
+  const maxVal=Math.max(...projects.map(p=>Math.max(tExp(p),tSpt(p))),1);
+  const barEl=document.getElementById('bar-chart-proj');
+  barEl.innerHTML=projects.map((p,i)=>{
+    const exp=tExp(p),spt=tSpt(p);
+    const autoProg=exp>0?Math.min(100,Math.round(spt/exp*100)):0;
+    const ePct=Math.round(exp/maxVal*100),sPct=Math.round(spt/maxVal*100);
+    const sColor=spt>exp&&exp>0?'#b91c1c':'#0f2044';
+    return`<div class="bar-row">
+      <div class="bar-label" title="${p.name}">${p.name.length>22?p.name.slice(0,22)+'…':p.name}</div>
+      <div class="bar-tracks">
+        <div class="bar-track"><div class="bar-fill" style="width:${ePct}%;background:#2d6a4f"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${sPct}%;background:${sColor}"></div></div>
+      </div>
+      <div class="bar-nums">${spt}u / ${exp}u <span style="color:var(--text3)">(${autoProg}%)</span></div>
+    </div>`;
+  }).join('');
+
+  // 4. Task pie — selector
+  const sel=document.getElementById('proj-selector');
+  sel.innerHTML=projects.map(p=>`<div class="proj-pill${selectedProjId===p.id?' active':''}" onclick="selectProjChart(${p.id})">${p.name.length>20?p.name.slice(0,20)+'…':p.name}</div>`).join('');
+  if(!selectedProjId&&projects.length>0)selectedProjId=projects[0].id;
+  renderTaskPie();
+}
+
+function selectProjChart(id){
+  selectedProjId=id;
+  document.querySelectorAll('.proj-pill').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.proj-pill').forEach(p=>{if(p.onclick.toString().includes('('+id+')'))p.classList.add('active');});
+  renderTaskPie();
+}
+
+function renderTaskPie(){
+  if(!selectedProjId)return;
+  const p=projects.find(x=>x.id===selectedProjId);
+  if(!p)return;
+  const activeCols=['todo','doing','done'];
+  const tasks=activeCols.flatMap(c=>p.tasks[c].map(t=>({...t,col:c})));
+  const withHours=tasks.filter(t=>t.e>0);
+  const data=withHours.map(t=>t.e);
+  const total=data.reduce((a,v)=>a+v,0);
+  document.getElementById('task-donut-total').textContent=total+'u';
+  drawDonut('chart-task-pie',data,PALETTE);
+  const leg=document.getElementById('legend-task-pie');
+  if(withHours.length===0){
+    leg.innerHTML='<div style="font-size:13px;color:var(--text3)">Geen uren ingevuld voor dit project (excl. backlog)</div>';
+  } else {
+    leg.innerHTML=withHours.map((t,i)=>`<div class="legend-item" style="margin-bottom:4px"><div class="legend-dot" style="background:${PALETTE[i%PALETTE.length]}"></div><span style="flex:1">${t.t.length>30?t.t.slice(0,30)+'…':t.t}</span><span style="color:var(--text3);margin-left:6px;font-family:'DM Mono',monospace">${t.e}u</span></div>`).join('');
+  }
+}
+
+</script>
+
+
+</body></html>
